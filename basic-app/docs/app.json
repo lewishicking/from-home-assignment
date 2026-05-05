@@ -1,0 +1,1 @@
+[{"name": "app.py", "content": "from shiny import render, ui\nfrom shiny.express import input\n\nui.panel_title(\"Hello Shiny!\")\nui.input_slider(\"n\", \"N\", 0, 100, 20)\n\n\n@render.text\ndef txt():\n    return f\"n*2 is {input.n() * 2}\"\n", "type": "text"}]
