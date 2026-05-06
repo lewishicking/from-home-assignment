@@ -4,51 +4,14 @@ from shinywidgets import output_widget, render_widget
 from ipyleaflet import Map, GeoJSON, basemaps, WidgetControl
 from ipywidgets import HTML
 import geopandas as gpd
-import pandas as pd
 import plotly.express as px
 import json
 
 APP_DIR = Path(__file__).parent
 
-# Location data
-sa2 = gpd.read_file(
-    APP_DIR / "statistical-area-2-2023-generalised.gpkg"
-).to_crs(4326)
-
-sa2["SA2"] = sa2["SA22023_V1_00"].astype(str)
-
-# Auckland only
-sa2 = sa2.cx[174.25:175.10, -37.25:-36.58].copy()
-
-# simplify geometry
-sa2["geometry"] = sa2["geometry"].simplify(0.002)
-
-# Work data
-work = pd.read_csv(
-    APP_DIR / "2023-census-main-means-of-travel-to-work-by-statistical-area.csv"
-).replace(-999, pd.NA)
-
-work["SA2"] = work["SA22023_V1_00_workplace_address"].astype(str)
-work["2018"] = pd.to_numeric(work["2018_Work_at_home"], errors="coerce")
-work["2023"] = pd.to_numeric(work["2023_Work_at_home"], errors="coerce")
-work["change"] = work["2023"] - work["2018"]
-
-work = work.groupby("SA2", as_index=False)[["2018", "2023", "change"]].mean()
-work_gdf = sa2.merge(work, on="SA2", how="left")
-
-# Study data
-edu = pd.read_csv(
-    APP_DIR / "2023-census-main-means-of-travel-to-education-by-statistical.csv"
-).replace(-999, pd.NA)
-
-edu["SA2"] = edu["SA22023_V1_00_educational_institution_address"].astype(str)
-edu["2018"] = pd.to_numeric(edu["2018_Study_at_home"], errors="coerce")
-edu["2023"] = pd.to_numeric(edu["2023_Study_at_home"], errors="coerce")
-edu["change"] = edu["2023"] - edu["2018"]
-
-edu = edu.groupby("SA2", as_index=False)[["2018", "2023", "change"]].mean()
-
-edu_gdf = sa2.merge(edu, on="SA2", how="left")
+# Load preprocessed data
+work_gdf = gpd.read_file(APP_DIR / "work.fgb")
+edu_gdf = gpd.read_file(APP_DIR / "study.fgb")
 
 
 # Map helpers
