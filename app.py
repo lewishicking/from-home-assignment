@@ -335,7 +335,7 @@ def server(input, output, session):
 
     work_map_widget.add_control(make_legend("Work from home"))
     study_map_widget.add_control(make_legend("Study from home"))
-    
+
     @reactive.effect
     def _update_work_map():
         work_layer.data = make_geojson(work_gdf, input.work_metric(), "Work from home")
@@ -379,3 +379,4 @@ def server(input, output, session):
 
 #App
 app = App(app_ui, server)
+#test
