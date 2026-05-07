@@ -1,7 +1,7 @@
 from pathlib import Path
 from shiny import App, ui, render, reactive
 from shinywidgets import output_widget, render_widget
-from ipyleaflet import Map, GeoJSON, basemaps, WidgetControl, Popup
+from ipyleaflet import Map, GeoJSON, basemaps, WidgetControl
 from ipywidgets import HTML
 import geopandas as gpd
 import plotly.express as px
@@ -17,33 +17,13 @@ edu_gdf = gpd.read_file(APP_DIR / "study.fgb")
 work_gdf["geometry"] = work_gdf["geometry"].simplify(0.003)
 edu_gdf["geometry"] = edu_gdf["geometry"].simplify(0.003)
 
-def add_popup_handler(layer, map_widget):
-    current_popup = {"popup": None}
-
+def add_popup_handler(layer, selected_info):
     def handle_click(**kwargs):
         feature = kwargs.get("feature")
-        coordinates = kwargs.get("coordinates")
 
-        if feature and coordinates:
+        if feature:
             props = feature["properties"]
-
-            # Remove old popup
-            if current_popup["popup"] is not None:
-                try:
-                    map_widget.remove_layer(current_popup["popup"])
-                except Exception:
-                    pass
-
-            popup = Popup(
-                location=coordinates,
-                child=HTML(value=props.get("popup", "No data available")),
-                close_button=True,
-                auto_close=True,
-                close_on_escape_key=True,
-            )
-
-            current_popup["popup"] = popup
-            map_widget.add_layer(popup)
+            selected_info.set(props["popup"])
 
     layer.on_click(handle_click)
                
@@ -184,7 +164,6 @@ app_ui = ui.page_fluid(
 
     ui.navset_tab(
 
-        # ---------------- INTRO PAGE ----------------
         ui.nav_panel(
             "Introduction",
 
@@ -193,41 +172,25 @@ app_ui = ui.page_fluid(
             ui.h2("Project Overview"),
 
             ui.p(
-                """
-                This dashboard explores patterns of working and studying
-                from home across Auckland SA2 areas using New Zealand
-                Census data from 2018 and 2023.
-                """
+                "This dashboard explores patterns of working and studying "
+                "from home across Auckland SA2 areas using New Zealand "
+                "Census data from 2018 and 2023."
             ),
 
             ui.p(
-                """
-                The project compares spatial differences in remote work
-                and remote study behaviour before and after major societal
-                changes such as COVID-19.
-                """
-            ),
-
-            ui.h3("Data Sources"),
-
-            ui.tags.ul(
-                ui.tags.li("2023 New Zealand Census"),
-                ui.tags.li("SA2 Generalised Boundaries"),
-                ui.tags.li("Work-from-home and study-from-home statistics"),
+                "The dashboard compares spatial differences in remote work "
+                "and remote study behaviour across Auckland."
             ),
 
             ui.h3("How to Use the Dashboard"),
 
             ui.tags.ul(
-                ui.tags.li("Use the Maps page to explore spatial patterns."),
-                ui.tags.li("Use the Statistics page to compare top areas."),
-                ui.tags.li("Switch between 2018, 2023, and change values."),
+                ui.tags.li("Open the Dashboard tab to view maps and statistics."),
+                ui.tags.li("Click regions on the maps to display area information."),
+                ui.tags.li("Use the left-side controls to switch variables."),
             ),
-
-            ui.br(),
         ),
 
-        # ---------------- DASHBOARD ----------------
         ui.nav_panel(
 
             "Dashboard",
@@ -269,32 +232,34 @@ app_ui = ui.page_fluid(
 
                 ui.navset_card_tab(
 
-                    # -------- MAPS TAB --------
                     ui.nav_panel(
 
                         "Maps",
 
                         ui.row(
+
                             ui.column(
                                 6,
                                 ui.h4("Work From Home"),
                                 output_widget("work_map", height="550px"),
+                                ui.output_ui("work_info"),
                             ),
 
                             ui.column(
                                 6,
                                 ui.h4("Study From Home"),
                                 output_widget("study_map", height="550px"),
+                                ui.output_ui("study_info"),
                             ),
                         ),
                     ),
 
-                    # -------- STATISTICS TAB --------
                     ui.nav_panel(
 
                         "Statistics",
 
                         ui.row(
+
                             ui.column(
                                 6,
                                 ui.h4("Top 10 Work From Home Areas"),
@@ -336,12 +301,16 @@ app_ui = ui.page_fluid(
 
     theme=shinyswatch.theme.minty,
 )
+
 # Server
 def server(input, output, session):
 
     # Build maps once
     work_map_widget = Map(center=(-36.85, 174.76), zoom=9, basemap=basemaps.OpenStreetMap.Mapnik)
     study_map_widget = Map(center=(-36.85, 174.76), zoom=9, basemap=basemaps.OpenStreetMap.Mapnik)
+
+    selected_work_info = reactive.Value("Click a work area on the map to see details.")
+    selected_study_info = reactive.Value("Click a study area on the map to see details.")
 
     work_layer = GeoJSON(
         data={"type": "FeatureCollection", "features": []},
@@ -350,8 +319,6 @@ def server(input, output, session):
         name="Work"
     )
 
-    add_popup_handler(work_layer, work_map_widget)
-
     study_layer = GeoJSON(
         data={"type": "FeatureCollection", "features": []},
         style_callback=lambda feature: feature["properties"]["style"],
@@ -359,7 +326,8 @@ def server(input, output, session):
         name="Study"
     )
 
-    add_popup_handler(study_layer, study_map_widget)
+    add_popup_handler(work_layer, selected_work_info)
+    add_popup_handler(study_layer, selected_study_info)
 
     work_map_widget.add_layer(work_layer)
     study_map_widget.add_layer(study_layer)
@@ -407,7 +375,13 @@ def server(input, output, session):
     def study_2023_chart():
         return make_bar(edu_gdf, "2023", "Top 10 Study From Home (2023)")
 
+    @render.ui
+    def work_info():
+        return ui.HTML(selected_work_info())
 
+    @render.ui
+    def study_info():
+        return ui.HTML(selected_study_info())
 #App
 app = App(app_ui, server)
 #test
