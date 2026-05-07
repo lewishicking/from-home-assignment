@@ -186,7 +186,7 @@ app_ui = ui.page_fluid(
 
         # ---------------- INTRO PAGE ----------------
         ui.nav_panel(
-            "Introduction",
+            "Introductionnn",
 
             ui.br(),
 
