@@ -14,7 +14,12 @@ APP_DIR = Path(__file__).parent
 work_gdf = gpd.read_file(APP_DIR / "work.fgb")
 edu_gdf = gpd.read_file(APP_DIR / "study.fgb")
 
+work_gdf["geometry"] = work_gdf["geometry"].simplify(0.003)
+edu_gdf["geometry"] = edu_gdf["geometry"].simplify(0.003)
+
 def add_popup_handler(layer, map_widget):
+    current_popup = {"popup": None}
+
     def handle_click(**kwargs):
         feature = kwargs.get("feature")
         coordinates = kwargs.get("coordinates")
@@ -22,17 +27,26 @@ def add_popup_handler(layer, map_widget):
         if feature and coordinates:
             props = feature["properties"]
 
+            # Remove old popup
+            if current_popup["popup"] is not None:
+                try:
+                    map_widget.remove_layer(current_popup["popup"])
+                except Exception:
+                    pass
+
             popup = Popup(
                 location=coordinates,
-                child=HTML(value=props["popup"]),
+                child=HTML(value=props.get("popup", "No data available")),
                 close_button=True,
                 auto_close=True,
                 close_on_escape_key=True,
             )
 
+            current_popup["popup"] = popup
             map_widget.add_layer(popup)
 
     layer.on_click(handle_click)
+               
 
 def make_geojson(gdf, value_col, category):
     plot_gdf = gdf.dropna(subset=["geometry", value_col]).copy()
@@ -64,6 +78,7 @@ def make_geojson(gdf, value_col, category):
             fill = colours[3]
         elif val <= q5:
             fill = colours[4]
+        
         else:
             fill = colours[5]
 
@@ -71,7 +86,11 @@ def make_geojson(gdf, value_col, category):
         value_2018 = props.get("2018")
         value_2023 = props.get("2023")
 
-        if value_2018 and value_2018 != 0:
+        if (
+            change_num is not None
+            and value_2018 is not None
+            and value_2018 != 0
+        ):
             change_pct = (change_num / value_2018) * 100
             change_pct_text = f"{change_pct:.1f}%"
         else:
@@ -84,14 +103,26 @@ def make_geojson(gdf, value_col, category):
             "fillOpacity": 0.8,
         }
 
-        props["popup"] = f"""
-        <b>{props.get("SA22023_V1_00_NAME", "Unknown area")}</b><br>
-        <b>{category}</b><br><br>
-        2018: {value_2018:.0f}<br>
-        2023: {value_2023:.0f}<br>
-        Change: {change_num:+.0f}<br>
-        Percentage change: {change_pct_text}
-        """
+        value_2018_text = (
+            "N/A" if value_2018 is None else f"{value_2018:.0f}"
+        )
+
+        value_2023_text = (
+            "N/A" if value_2023 is None else f"{value_2023:.0f}"
+        )
+
+        change_num_text = (
+            "N/A" if change_num is None else f"{change_num:+.0f}"
+        )
+
+        props["popup"] = (
+            f"<b>{props.get('SA22023_V1_00_NAME', 'Unknown')}</b><br>"
+            f"{category}<br>"
+            f"2018: {value_2018_text}<br>"
+            f"2023: {value_2023_text}<br>"
+            f"Change: {change_num_text}<br>"
+            f"% Change: {change_pct_text}"
+        )
 
     return geojson_data
 # Map helpers
