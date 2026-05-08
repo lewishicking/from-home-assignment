@@ -218,7 +218,11 @@ app_ui = ui.page_fluid(
         " According to RNZ nearly 20 percent of the adult population of New Zealand report working from home."
         " An increase of 60 percent compared to census results in 2018."
         " Post-pandemic working habits are often pointed at for this switch in working behaviour."
-        " I hope this anlysis could be used in conjintion with behaviour and economic studies."
+        "In this analysis, we can clearly see the increase in the amount of people working from home."
+        " But also the shifts in where those people are working or studying from home."
+        " There is a clear pattern of Working and Studying from home being a rurally dominated activity to switching to the city"
+        " For example, pre pandemic home work jobs were concidered ones in the rural sector but now that opnion has changed."
+        " I hope this analysis could be used in conjintion with behaviour and economic studies."
         " As politicians are divided on the benefits or harms of people working from home."
         " Some argue that it encourages foot traffic for businessess and it promotes more flexible routines."
         " But some say it hinders productivity."
@@ -259,6 +263,14 @@ ui.tags.ul(
         ui.a(
             "RNZ: Pros and cons of working from home",
             href="https://www.rnz.co.nz/news/national/528854/the-pros-and-cons-of-working-from-home",
+            target="_blank",
+        )
+    ),
+
+       ui.tags.li(
+        ui.a(
+            "Shifting work attitudes pre and post pandemic",
+            href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9988592/",
             target="_blank",
         )
     ),
