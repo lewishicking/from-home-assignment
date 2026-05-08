@@ -28,6 +28,7 @@ def add_popup_handler(layer, selected_info):
     layer.on_click(handle_click)
                
 
+# Make catogories
 def make_geojson(gdf, value_col, category):
     plot_gdf = gdf.dropna(subset=["geometry", value_col]).copy()
     geojson_data = json.loads(plot_gdf.to_json())
@@ -62,6 +63,7 @@ def make_geojson(gdf, value_col, category):
         else:
             fill = colours[5]
 
+# Calculate level of change
         change_num = props.get("change")
         value_2018 = props.get("2018")
         value_2023 = props.get("2023")
@@ -105,6 +107,7 @@ def make_geojson(gdf, value_col, category):
         )
 
     return geojson_data
+
 # Map helpers
 def make_legend(title):
     colours = [
@@ -135,7 +138,6 @@ def make_legend(title):
     """
     return WidgetControl(widget=HTML(value=legend_html), position="bottomleft")
 
-
 def make_bar(df, col, title):
     top10 = (
         df.dropna(subset=[col])[["SA22023_V1_00_NAME", col]]
@@ -149,50 +151,199 @@ def make_bar(df, col, title):
         y="SA22023_V1_00_NAME",
         orientation="h",
         title=title,
+        labels={
+            "SA22023_V1_00_NAME": "Regions",
+            col: "People",
+        },
     )
+
     fig.update_layout(
         yaxis={"categoryorder": "total ascending"},
         margin={"l": 20, "r": 20, "t": 50, "b": 20},
     )
+
     return fig
 
+def make_negative_change_bar(df, title):
 
-# UI
+    decline_df = (
+        df[df["change"] < 0]
+        .sort_values("change")
+        .head(10)
+    )
+
+    fig = px.bar(
+    decline_df,
+    x="change",
+    y="SA22023_V1_00_NAME",
+    orientation="h",
+    title=title,
+    labels={
+        "SA22023_V1_00_NAME": "Regions",
+        "change": "Change in People",
+    },
+)
+
+    fig.update_layout(
+        yaxis={"categoryorder": "total ascending"},
+        margin={"l": 20, "r": 20, "t": 50, "b": 20},
+    )
+
+    return fig
+
+# App UI
+
+# Introduction page
 app_ui = ui.page_fluid(
 
-    ui.h1("Auckland Work and Study From Home (2018–2023)"),
+    ui.h1("Remote Work and Study in Auckland: An Interactive Overview"),
 
     ui.navset_tab(
 
-        ui.nav_panel(
-            "Introduction",
+       ui.nav_panel(
+        "Introduction",
 
-            ui.br(),
+    ui.br(),
+    ui.h2("Project Overview"),
 
-            ui.h2("Project Overview"),
+    ui.p(
+        "This dashboard explores patterns of working and studying"
+        "from home across Auckland SA2 areas using Census records"
+        "from 2018 and 2023. In both surveys, the Adult New Zealand population"
+        "were asked In your main job, did you mostly work at home... or work away from home?"
+    ),
 
-            ui.p(
-                "This dashboard explores patterns of working and studying "
-                "from home across Auckland SA2 areas using New Zealand "
-                "Census data from 2018 and 2023."
-            ),
+    ui.p(
+        "The maps provided in this dashboard are used to expore behaviour changes from deciding to work away from home to working from home."
+        " According to RNZ nearly 20 percent of the adult population of New Zealand report working from home."
+        " An increase of 60 percent compared to census results in 2018."
+        " Post-pandemic working habits are often pointed at for this switch in working behaviour."
+        " I hope this anlysis could be used in conjintion with behaviour and economic studies."
+        " As politicians are divided on the benefits or harms of people working from home."
+        " Some argue that it encourages foot traffic for businessess and it promotes more flexible routines."
+        " But some say it hinders productivity."
+        
+    ),
+    
+    ui.p(
+        "From this data, Hobsonville Point Park was the most popular suburb for working and studing from home."
+        " It also had the most change from 2018 to 2023, with an additional 825 people studying and working from home between the five years."
+        " Hobsonville is a new devlopment in Auckland sold with modern town houses often centered towards indivudals who can work from home."
+        " Furthermore, Point Catalina is also apart of Hobsonville further proving an 'attractability' of Hobsonville being a place centred modern working from home initiatives."
+        " This analysis combined with data on people's profesions could analysis whether these individuals have their own busineeses, and if that is a reason to working from home."
+        " Millwater being the next on the list further proves this point as Millwater too is a new devlopment in the North of Auckland."
+    ),
+    
+    ui.h3("Work vs Study, what is more popular?"),
 
-            ui.p(
-                "The dashboard compares spatial differences in remote work "
-                "and remote study behaviour across Auckland."
-            ),
-
-            ui.h3("How to Use the Dashboard"),
-
-            ui.tags.ul(
-                ui.tags.li("Open the Dashboard tab to view maps and statistics."),
-                ui.tags.li("Click regions on the maps to display area information."),
-                ui.tags.li("Use the left-side controls to switch variables."),
-            ),
+        ui.p(
+        "Working from home is more popular and experianced much larger increases than studying from home between 2018 to 2023."
+        " This is probably due to long term effects of working from home initiatives from the Covid-19 pandemic."
+        " New technological devlopments and changing attitudes around work attitude have lead to such change."
+        " Working from home is also much more attractive for working individuals with full time responsibities like children."
+        " Therefore, working from home opens more opportunities for people to work full time."
         ),
 
-        ui.nav_panel(
+        ui.p(
+            "Students on the otherhand benefit more from engaging with their education says one study."
+            " While post pandemic attitudes to translate to students, for the most part it is important to attend classes, laboratories, and tutorials."
+            " As a student, I understand this because I need to go to my laboratories to understand my coursework."
+            " Furthermore, many students do not want to be left out of the university experience."
 
+        ),
+
+ui.h4("Sources"),
+
+ui.tags.ul(
+    ui.tags.li(
+        ui.a(
+            "RNZ: Pros and cons of working from home",
+            href="https://www.rnz.co.nz/news/national/528854/the-pros-and-cons-of-working-from-home",
+            target="_blank",
+        )
+    ),
+
+    ui.tags.li(
+        ui.a(
+            "Taylor & Francis study on remote work",
+            href="https://www.tandfonline.com/doi/full/10.1080/09585192.2024.2422013",
+            target="_blank",
+        )
+    ),
+
+    ui.tags.li(
+        ui.a(
+            "NCBI study on online learning",
+            href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9769479/",
+            target="_blank",
+        )
+    ),
+
+    ui.tags.li(
+        ui.a(
+            "OneRoof Hobsonville profile",
+            href="https://www.oneroof.co.nz/suburb/hobsonville-waitakere-city-1185",
+            target="_blank",
+        )
+    ),
+),
+
+ui.h4("How to Use the dashboard"),
+
+ui.tags.ul(
+    ui.tags.li("Open the dashboard tab to view maps and statistics."),
+    ui.tags.li("Click regions on the maps to display area information."),
+    ui.tags.li("Use the left-side controls to switch variables."),
+),
+
+ui.hr(),
+
+# Key stats
+ui.h5("Key Statistics"),
+
+ui.tags.ul(
+
+    ui.tags.li(
+        f"Largest increase in working from home: "
+        f"{work_gdf.loc[work_gdf['change'].idxmax(), 'SA22023_V1_00_NAME']} "
+        f"({work_gdf['change'].max():+.0f} people)"
+    ),
+
+    ui.tags.li(
+        f"Largest increase in studying from home: "
+        f"{edu_gdf.loc[edu_gdf['change'].idxmax(), 'SA22023_V1_00_NAME']} "
+        f"({edu_gdf['change'].max():+.0f} people)"
+    ),
+
+    ui.tags.li(
+        f"Highest number working from home in 2023: "
+        f"{work_gdf.loc[work_gdf['2023'].idxmax(), 'SA22023_V1_00_NAME']} "
+        f"({work_gdf['2023'].max():.0f} people)"
+    ),
+
+    ui.tags.li(
+        f"Highest number studying from home in 2023: "
+        f"{edu_gdf.loc[edu_gdf['2023'].idxmax(), 'SA22023_V1_00_NAME']} "
+        f"({edu_gdf['2023'].max():.0f} people)"
+    ),
+
+    ui.tags.li(
+        f"Greatest overall work-from-home change (2018–2023): "
+        f"{work_gdf.loc[work_gdf['change'].abs().idxmax(), 'SA22023_V1_00_NAME']} "
+        f"({work_gdf['change'].abs().max():.0f} people)"
+    ),
+
+    ui.tags.li(
+        f"Greatest overall study-from-home change (2018–2023): "
+        f"{edu_gdf.loc[edu_gdf['change'].abs().idxmax(), 'SA22023_V1_00_NAME']} "
+        f"({edu_gdf['change'].abs().max():.0f} people)"
+    ),
+),
+
+        ),
+
+# Map sidebar
+        ui.nav_panel(
             "Dashboard",
 
             ui.layout_sidebar(
@@ -227,13 +378,25 @@ app_ui = ui.page_fluid(
                         selected="change",
                     ),
 
+                    ui.hr(),
+# Map slider - for diffrences
+                    ui.h5("Difference filter"),
+                    ui.input_slider(
+                        "change_range",
+                        "Show areas with change between:",
+                        min=-24,
+                        max=714,
+                        value=[-24, 714],
+                        step=50,
+                    ),
+
                     width=300,
                 ),
 
+# Card tab for histogram stats
                 ui.navset_card_tab(
 
                     ui.nav_panel(
-
                         "Maps",
 
                         ui.row(
@@ -255,7 +418,6 @@ app_ui = ui.page_fluid(
                     ),
 
                     ui.nav_panel(
-
                         "Statistics",
 
                         ui.row(
@@ -280,16 +442,45 @@ app_ui = ui.page_fluid(
                             ui.nav_panel(
                                 "Work Histograms",
                                 ui.row(
-                                    ui.column(6, output_widget("work_2018_chart", height="400px")),
-                                    ui.column(6, output_widget("work_2023_chart", height="400px")),
+                                    ui.column(
+                                        6,
+                                        output_widget("work_2018_chart", height="400px"),
+                                    ),
+                                    ui.column(
+                                        6,
+                                        output_widget("work_2023_chart", height="400px"),
+                                    ),
                                 ),
                             ),
 
                             ui.nav_panel(
                                 "Study Histograms",
                                 ui.row(
-                                    ui.column(6, output_widget("study_2018_chart", height="400px")),
-                                    ui.column(6, output_widget("study_2023_chart", height="400px")),
+                                    ui.column(
+                                        6,
+                                        output_widget("study_2018_chart", height="400px"),
+                                    ),
+                                    ui.column(
+                                        6,
+                                        output_widget("study_2023_chart", height="400px"),
+                                    ),
+                                ),
+                            ),
+
+                            ui.nav_panel(
+                                "Decline Charts",
+                                ui.row(
+                                    ui.column(
+                                        6,
+                                        ui.h4("Largest Decline in Working From Home"),
+                                        output_widget("work_decline_chart", height="400px"),
+                                    ),
+
+                                    ui.column(
+                                        6,
+                                        ui.h4("Largest Decline in Studying From Home"),
+                                        output_widget("study_decline_chart", height="400px"),
+                                    ),
                                 ),
                             ),
                         ),
@@ -305,7 +496,7 @@ app_ui = ui.page_fluid(
 # Server
 def server(input, output, session):
 
-    # Build maps once
+# Build maps once
     work_map_widget = Map(center=(-36.85, 174.76), zoom=9, basemap=basemaps.OpenStreetMap.Mapnik)
     study_map_widget = Map(center=(-36.85, 174.76), zoom=9, basemap=basemaps.OpenStreetMap.Mapnik)
 
@@ -335,13 +526,30 @@ def server(input, output, session):
     work_map_widget.add_control(make_legend("Work from home"))
     study_map_widget.add_control(make_legend("Study from home"))
 
+    @reactive.calc
+    def filtered_work_gdf():
+        low, high = input.change_range()
+        return work_gdf[
+            (work_gdf["change"] >= low) &
+            (work_gdf["change"] <= high)
+        ]
+
+
+    @reactive.calc
+    def filtered_study_gdf():
+        low, high = input.change_range()
+        return edu_gdf[
+            (edu_gdf["change"] >= low) &
+            (edu_gdf["change"] <= high)
+        ]
+
     @reactive.effect
     def _update_work_map():
-        work_layer.data = make_geojson(work_gdf, input.work_metric(), "Work from home")
+       work_layer.data = make_geojson(filtered_work_gdf(), input.work_metric(), "Work from home")
 
     @reactive.effect
     def _update_study_map():
-        study_layer.data = make_geojson(edu_gdf, input.study_metric(), "Study from home")
+        study_layer.data = make_geojson(filtered_study_gdf(), input.study_metric(), "Study from home")
 
     @render_widget
     def work_map():
@@ -353,11 +561,11 @@ def server(input, output, session):
 
     @render_widget
     def work_chart():
-        return make_bar(work_gdf, input.work_metric(), f"Top 10 Work From Home ({input.work_metric()})")
+        return make_bar(filtered_work_gdf(), input.work_metric(), f"Top 10 Work From Home ({input.work_metric()})")
 
     @render_widget
     def study_chart():
-        return make_bar(edu_gdf, input.study_metric(), f"Top 10 Study From Home ({input.study_metric()})")
+        return make_bar(filtered_study_gdf(), input.study_metric(), f"Top 10 Study From Home ({input.study_metric()})")
 
     @render_widget
     def work_2018_chart():
@@ -366,6 +574,20 @@ def server(input, output, session):
     @render_widget
     def work_2023_chart():
         return make_bar(work_gdf, "2023", "Top 10 Work From Home (2023)")
+    
+    @render_widget
+    def work_decline_chart():
+        return make_negative_change_bar(
+            work_gdf,
+            "Largest Decline in Working From Home"
+        )
+
+    @render_widget
+    def study_decline_chart():
+        return make_negative_change_bar(
+            edu_gdf,
+            "Largest Decline in Studying From Home"
+        )
 
     @render_widget
     def study_2018_chart():
@@ -382,6 +604,7 @@ def server(input, output, session):
     @render.ui
     def study_info():
         return ui.HTML(selected_study_info())
+
 #App
 app = App(app_ui, server)
-#test
+
