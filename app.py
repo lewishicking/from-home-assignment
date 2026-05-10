@@ -152,7 +152,7 @@ def make_bar(df, col, title):
         orientation="h",
         title=title,
         labels={
-            "SA22023_V1_00_NAME": "Region",
+            "SA22023_V1_00_NAME": "Regions",
             col: "People",
         },
     )
@@ -179,7 +179,7 @@ def make_negative_change_bar(df, title):
     orientation="h",
     title=title,
     labels={
-        "SA22023_V1_00_NAME": "Region",
+        "SA22023_V1_00_NAME": "Regions",
         "change": "Change in People",
     },
 )
