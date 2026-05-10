@@ -1,7 +1,7 @@
 ```
 title: "GISCI 343 Assignment 2: Design Report"
 author: "Lewis Hicking (lhic778)"
-date: today
+date: 10/05/2026
 format:
   pdf:
     documentclass: article
@@ -13,6 +13,7 @@ format:
 
 ## 1. Motivation and Audience
 This dashboard is used to understand the change in people working or studying from home following the COVID-19 pandemic, between the years 2018 and 2023. RNZ reported a 60% increase in the number of people working from home. The main driver of this increase is government lockdowns that mandated working and studying from home. 
+
 The dashboard allows for simple visualisation of these changes. The dashboard looks at how different Auckland suburbs changed to working/studying from home. From the dashboard, working/studying from home is more popular in some areas than others. The dashboard also shows that working from home is more popular overall than studying from home, and explains why. 
 
 From these maps, businesses that profit from remote work, such as real estate developers and urban planners, can see where working and studying from home is popular. Developers can plan ways to make it easier to work or study from home. Public transport agencies (such as Auckland Transport) may use this data to analyse changes in commuting patterns before and after the COVID-19 pandemic. Alternatively, this data could be used in the event of future pandemics or other events like  COVID-19. The recent Iran War oil crisis has led to another rise in working from home in some countries due to rising petrol/diesel costs. Therefore, this data would be useful for understanding where people are working from home and how external economic events affect people's behaviour. 
