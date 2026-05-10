@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>design-report</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="Design report_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Design report_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="Design report_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="Design report_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="Design report_files/libs/quarto-html/popper.min.js"></script>
+<script src="Design report_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Design report_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Design report_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Design report_files/libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Design report_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Design report_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Design report_files/libs/bootstrap/bootstrap-9e3ffae467580fdb927a41352e75a2e0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="Design report_files/libs/quarto-diagram/mermaid.min.js"></script>
+<script src="Design report_files/libs/quarto-diagram/mermaid-init.js"></script>
+<link href="Design report_files/libs/quarto-diagram/mermaid.css" rel="stylesheet">
+
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+
+
+
+<pre><code>title: "GISCI 343 Assignment 2: Design Report"
+author: "Lewis Hicking (lhic778)"
+date: today
+format:
+  pdf:
+    documentclass: article
+    geometry: margin=2.5cm
+    fontsize: 11pt
+    number-sections: true
+    toc: false</code></pre>
+<section id="motivation-and-audience" class="level2">
+<h2 class="anchored" data-anchor-id="motivation-and-audience">1. Motivation and Audience</h2>
+<p>This dashboard is used to understand the change in people working or studying from home following the COVID-19 pandemic, between the years 2018 and 2023. RNZ reported a 60% increase in the number of people working from home. The main driver of this increase is government lockdowns that mandated working and studying from home. The dashboard allows for simple visualisation of these changes. The dashboard looks at how different Auckland suburbs changed to working/studying from home. From the dashboard, working/studying from home is more popular in some areas than others. The dashboard also shows that working from home is more popular overall than studying from home, and explains why.</p>
+<p>From these maps, businesses that profit from remote work, such as real estate developers and urban planners, can see where working and studying from home is popular. Developers can plan ways to make it easier to work or study from home. Public transport agencies (such as Auckland Transport) may use this data to analyse changes in commuting patterns before and after the COVID-19 pandemic. Alternatively, this data could be used in the event of future pandemics or other events like COVID-19. The recent Iran War oil crisis has led to another rise in working from home in some countries due to rising petrol/diesel costs. Therefore, this data would be useful for understanding where people are working from home and how external economic events affect people’s behaviour.</p>
+</section>
+<section id="data-and-preparation" class="level2">
+<h2 class="anchored" data-anchor-id="data-and-preparation">2. Data and Preparation</h2>
+<p>This dashboard uses Auckland SA2 boundary data, combined with Census data from 2018 and 2023. In both years, the Adult New Zealand population were asked: “In your main job, did you mostly work at home… or work away from home?” The datasets were then joined using SA2 identifiers and processed using GeoPandas and Python. Other variables were included to calculate changes between 2018 and 2023 in each region. Polygons also needed to be simplified and converted to GeoJSON layers for display in ipyleaflet. Also, the coordinate system was changed to EPSG:4326 so maps would be compatible with Leaflet web mapping. One limitation of this dataset is that it relies on raw counts instead of percentage changes in population. Therefore, this dataset will naturally show regions of higher population growth at the top.</p>
+</section>
+<section id="technical-architecture" class="level2">
+<h2 class="anchored" data-anchor-id="technical-architecture">3. Technical architecture</h2>
+<p>The dashboard is developed using Shiny for Python with reactive programming. The dashboard included user inputs such as radio buttons and sliders, driven by reactive calculations and filtering underlying GeoDataFrames. Filtered datasets are passed to maps and charts. Visual outputs are automatically updated. Interactive maps are built with ipyleaflet and GeoJSON layers, and charts are built with Plotly Express. There are custom functions like make_geojson() and make_bar(), that reduce code repetition and improve readability. When running the app, it was clear that geometries needed to be reduced in file size for it to run. Maps were also only installed once before being reactively updated. From these changes, the app could run smoothly.</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart TD
+
+A[User Inputs] --&gt; B[Reactive Filtering]
+
+A1[Work Radio Buttons] --&gt; B
+A2[Study Radio Buttons] --&gt; B
+A3[Difference Slider] --&gt; B
+
+B --&gt; C[Filtered Work GeoDataFrame]
+B --&gt; D[Filtered Study GeoDataFrame]
+
+C --&gt; E[GeoJSON Map Layers]
+D --&gt; F[GeoJSON Map Layers]
+
+C --&gt; G[Plotly Work Charts]
+D --&gt; H[Plotly Study Charts]
+
+E --&gt; I[Interactive Work Map]
+F --&gt; J[Interactive Study Map]
+
+G --&gt; K[Statistics Outputs]
+H --&gt; K
+
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</section>
+<section id="user-interface-walkthrough" class="level2">
+<h2 class="anchored" data-anchor-id="user-interface-walkthrough">4. User interface walkthrough</h2>
+<p>The application starts on the introduction page, which explains the dashboard’s purpose and provides background on the need to work/study from home. It outlines the key findings from the dashboard and provides explanations. There is also an included summary of regions with the highest growth for both work and study. <img src="Images/Dashboard-home%20screen.png" class="img-fluid" alt="Introduction page with key stats and summary"> If the user selects the Dashboard tab, two interactive maps show work from home and study from home patterns across Auckland SA2 regions. Users can select either 2018 or 2023 for both work and study using the radio button controls in the sidebar. There is also a slider that filters regions by the significance of change between the 2018 and 2023 studies and work. If a user clicks an individual polygon on the maps, additional information on 2018 and 2023 values, numerical change, and percentage change for that particular region is displayed. <img src="Images/Map%20Overview.png" class="img-fluid" alt="Maps page in action showing filters in effect, radio buttons and polygons selected"> <img src="Images/Stats%20tab%20decline.png" class="img-fluid" alt="Statistics tab default opening"> <img src="Images/Stats%20tab%20study.png" class="img-fluid" alt="Statistics tab with study selected"> <img src="Images/Stats%20tab%20work.png" class="img-fluid" alt="Statistics tab with work selected"> <img src="Images/Stats%20tab%20filtered.png" class="img-fluid" alt="Statistics tab with silder"> The user interface is designed to be simple to use. Providing useful data for people like real estate developers and city planners who may not have much GIS experience but would benefit from the data produced. The minty Shinywatch theme was chosen for its clean design and modern appeal. The sidebar controls keep filtering tools organised and accessible.</p>
+</section>
+<section id="limitations-and-future-improvements" class="level2">
+<h2 class="anchored" data-anchor-id="limitations-and-future-improvements">5. Limitations and future improvements</h2>
+<p>This dashboard only looks at Census data from 2018 and 2023. Therefore, it is not looking at short-term trends in people studying/working from home. For example, if 2020 were included as a census year. (The year of COVID-19 lockdowns). It would be useful to examine the number of individuals working/studying from home. Also, I am not considering seasonal changes, like whether people are more likely to work or study from home in the winter than in the summer.</p>
+<p>Furthermore, the data relies on raw counts rather than population percentages. Meaning the data is skewed toward highly populated regions rather than smaller ones. Also, the geometries were heavily simplified, reducing spatial precision.</p>
+<p>This dashboard does not reflect demographic or socioeconomic variables such as age, income, or profession. Alternatively, whether someone has kids, which is a big reason people work from home, RNZ reports. This could help reveal why some regions have more people working from home than others. This dashboard cannot determine the direct causes of behaviour change for people to switch to working/studying from home.</p>
+<p>If more data were available, future improvements could include demographic filtering by age, gender, family type, housing development, and dominant employment sectors, which could help build insights. &nbsp;Also, it would be good to see this at a national scale to see how urban towns in New Zealand have changed, as well as just Auckland.</p>
+</section>
+<section id="links-to-useful-resources" class="level2">
+<h2 class="anchored" data-anchor-id="links-to-useful-resources">Links to useful resources:</h2>
+<p>RNZ: Pros and cons of working from home: https://www.rnz.co.nz/news/national/528854/the-pros-and-cons-of-working-from-home</p>
+<p>StatsNZ data: https://datafinder.stats.govt.nz/</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,0 +1,78 @@
+```
+title: "GISCI 343 Assignment 2: Design Report"
+author: "Lewis Hicking (lhic778)"
+date: today
+format:
+  pdf:
+    documentclass: article
+    geometry: margin=2.5cm
+    fontsize: 11pt
+    number-sections: true
+    toc: false
+```
+
+## 1. Motivation and Audience
+This dashboard is used to understand the change in people working or studying from home following the COVID-19 pandemic, between the years 2018 and 2023. RNZ reported a 60% increase in the number of people working from home. The main driver of this increase is government lockdowns that mandated working and studying from home. 
+The dashboard allows for simple visualisation of these changes. The dashboard looks at how different Auckland suburbs changed to working/studying from home. From the dashboard, working/studying from home is more popular in some areas than others. The dashboard also shows that working from home is more popular overall than studying from home, and explains why. 
+
+From these maps, businesses that profit from remote work, such as real estate developers and urban planners, can see where working and studying from home is popular. Developers can plan ways to make it easier to work or study from home. Public transport agencies (such as Auckland Transport) may use this data to analyse changes in commuting patterns before and after the COVID-19 pandemic. Alternatively, this data could be used in the event of future pandemics or other events like  COVID-19. The recent Iran War oil crisis has led to another rise in working from home in some countries due to rising petrol/diesel costs. Therefore, this data would be useful for understanding where people are working from home and how external economic events affect people's behaviour. 
+
+## 2. Data and Preparation
+This dashboard uses Auckland SA2 boundary data, combined with Census data from 2018  and 2023. In both years, the Adult New Zealand population were asked: "In your main job, did you mostly work at home... or work away from home?" The datasets were then joined using SA2 identifiers and processed using GeoPandas and Python. Other variables were included to calculate changes between 2018 and 2023 in each region. Polygons also needed to be simplified and converted to GeoJSON layers for display in ipyleaflet. Also, the coordinate system was changed to EPSG:4326 so maps would be compatible with Leaflet web mapping. One limitation of this dataset is that it relies on raw counts instead of percentage changes in population. Therefore, this dataset will naturally show regions of higher population growth at the top. 
+
+## 3. Technical architecture
+The dashboard is developed using Shiny for Python with reactive programming. The dashboard included user inputs such as radio buttons and sliders, driven by reactive calculations and filtering underlying GeoDataFrames. Filtered datasets are passed to maps and charts. Visual outputs are automatically updated. Interactive maps are built with ipyleaflet and GeoJSON layers, and charts are built with Plotly Express. There are custom functions like make_geojson() and make_bar(), that reduce code repetition and improve readability. When running the app, it was clear that geometries needed to be reduced in file size for it to run. Maps were also only installed once before being reactively updated. From these changes, the app could run smoothly.
+
+```{mermaid}
+flowchart TD
+
+A[User Inputs] --> B[Reactive Filtering]
+
+A1[Work Radio Buttons] --> B
+A2[Study Radio Buttons] --> B
+A3[Difference Slider] --> B
+
+B --> C[Filtered Work GeoDataFrame]
+B --> D[Filtered Study GeoDataFrame]
+
+C --> E[GeoJSON Map Layers]
+D --> F[GeoJSON Map Layers]
+
+C --> G[Plotly Work Charts]
+D --> H[Plotly Study Charts]
+
+E --> I[Interactive Work Map]
+F --> J[Interactive Study Map]
+
+G --> K[Statistics Outputs]
+H --> K
+
+```
+
+## 4. User interface walkthrough
+The application starts on the introduction page, which explains the dashboard's purpose and provides background on the need to work/study from home. It outlines the key findings from the dashboard and provides explanations. There is also an included summary of regions with the highest growth for both work and study. 
+![Introduction page with key stats and summary](Images/Dashboard-home%20screen.png)
+If the user selects the Dashboard tab, two interactive maps show work from home and study from home patterns across Auckland SA2 regions. Users can select either 2018 or 2023 for both work and study using the radio button controls in the sidebar. There is also a slider that filters regions by the significance of change between the 2018 and 2023 studies and work. If a user clicks an individual polygon on the maps, additional information on 2018 and 2023 values, numerical change, and percentage change for that particular region is displayed. 
+![Maps page in action showing filters in effect, radio buttons and polygons selected](Images/Map%20Overview.png)
+![Statistics tab default opening](Images/Stats%20tab%20decline.png)
+![Statistics tab with study selected](Images/Stats%20tab%20study.png)
+![Statistics tab with work selected](Images/Stats%20tab%20work.png)
+![Statistics tab with silder](Images/Stats%20tab%20filtered.png)
+The user interface is designed to be simple to use. Providing useful data for people like real estate developers and city planners who may not have much GIS experience but would benefit from the data produced. The minty Shinywatch theme was chosen for its clean design and modern appeal. The sidebar controls keep filtering tools organised and accessible. 
+
+## 5. Limitations and future improvements
+This dashboard only looks at Census data from 2018 and 2023. Therefore, it is not looking at short-term trends in people studying/working from home. For example, if 2020 were included as a census year. (The year of COVID-19 lockdowns). It would be useful to examine the number of individuals working/studying from home. Also, I am not considering seasonal changes, like whether people are more likely to work or study from home in the winter than in the summer.
+
+Furthermore, the data relies on raw counts rather than population percentages. Meaning the data is skewed toward highly populated regions rather than smaller ones. Also, the geometries were heavily simplified, reducing spatial precision. 
+
+This dashboard does not reflect demographic or socioeconomic variables such as age, income, or profession. Alternatively, whether someone has kids, which is a big reason people work from home, RNZ reports. This could help reveal why some regions have more people working from home than others. This dashboard cannot determine the direct causes of behaviour change for people to switch to working/studying from home. 
+
+If more data were available, future improvements could include demographic filtering by age, gender, family type, housing development, and dominant employment sectors, which could help build insights.  Also, it would be good to see this at a national scale to see how urban towns in New Zealand have changed, as well as just Auckland.
+
+## Links to useful resources: 
+
+RNZ: Pros and cons of working from home: https://www.rnz.co.nz/news/national/528854/the-pros-and-cons-of-working-from-home 
+
+StatsNZ data: https://datafinder.stats.govt.nz/ 
+
+

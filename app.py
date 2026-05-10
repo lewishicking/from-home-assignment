@@ -208,9 +208,9 @@ app_ui = ui.page_fluid(
 
     ui.p(
         "This dashboard explores patterns of working and studying"
-        "from home across Auckland SA2 areas using Census records"
-        "from 2018 and 2023. In both surveys, the Adult New Zealand population"
-        "were asked In your main job, did you mostly work at home... or work away from home?"
+        " from home across Auckland SA2 areas using Census records"
+        " from 2018 and 2023. In both surveys, the adult New Zealand population"
+        " were asked In your main job, did you mostly work at home... or work away from home?"
     ),
 
     ui.p(
@@ -218,11 +218,11 @@ app_ui = ui.page_fluid(
         " According to RNZ nearly 20 percent of the adult population of New Zealand report working from home."
         " An increase of 60 percent compared to census results in 2018."
         " Post-pandemic working habits are often pointed at for this switch in working behaviour."
-        "In this analysis, we can clearly see the increase in the amount of people working from home."
+        " In this analysis, we can clearly see the increase in the amount of people working from home."
         " But also the shifts in where those people are working or studying from home."
-        " There is a clear pattern of Working and Studying from home being a rurally dominated activity to switching to the city"
+        " There is a clear pattern of working and studying from home being a rurally dominated activity to switching to the city"
         " For example, pre pandemic home work jobs were concidered ones in the rural sector but now that opnion has changed."
-        " I hope this analysis could be used in conjintion with behaviour and economic studies."
+        " I hope this analysis could be used in conjunction with behaviour and economic studies."
         " As politicians are divided on the benefits or harms of people working from home."
         " Some argue that it encourages foot traffic for businessess and it promotes more flexible routines."
         " But some say it hinders productivity."
@@ -234,14 +234,15 @@ app_ui = ui.page_fluid(
         " It also had the most change from 2018 to 2023, with an additional 825 people studying and working from home between the five years."
         " Hobsonville is a new devlopment in Auckland sold with modern town houses often centered towards indivudals who can work from home."
         " Furthermore, Point Catalina is also apart of Hobsonville further proving an 'attractability' of Hobsonville being a place centred modern working from home initiatives."
-        " This analysis combined with data on people's profesions could analysis whether these individuals have their own busineeses, and if that is a reason to working from home."
         " Millwater being the next on the list further proves this point as Millwater too is a new devlopment in the North of Auckland."
+        " This analysis combined with data on people's profesions could analysis whether these individuals have their own businesses, and if that is a reason to working from home."
+        
     ),
     
     ui.h3("Work vs Study, what is more popular?"),
 
         ui.p(
-        "Working from home is more popular and experianced much larger increases than studying from home between 2018 to 2023."
+        "Working from home is more popular and experienced much larger increases than studying from home between 2018 to 2023."
         " This is probably due to long term effects of working from home initiatives from the Covid-19 pandemic."
         " New technological devlopments and changing attitudes around work attitude have lead to such change."
         " Working from home is also much more attractive for working individuals with full time responsibities like children."
@@ -249,7 +250,7 @@ app_ui = ui.page_fluid(
         ),
 
         ui.p(
-            "Students on the otherhand benefit more from engaging with their education says one study."
+            "Students on the other hand benefit more from engaging with their education says one study."
             " While post pandemic attitudes to translate to students, for the most part it is important to attend classes, laboratories, and tutorials."
             " As a student, I understand this because I need to go to my laboratories to understand my coursework."
             " Furthermore, many students do not want to be left out of the university experience."
@@ -257,15 +258,21 @@ app_ui = ui.page_fluid(
         ),
 
 ui.h4("Sources"),
-
-ui.tags.ul(
-    ui.tags.li(
-        ui.a(
-            "RNZ: Pros and cons of working from home",
-            href="https://www.rnz.co.nz/news/national/528854/the-pros-and-cons-of-working-from-home",
-            target="_blank",
-        )
-    ),
+    ui.tags.ul(
+        ui.tags.li(
+            ui.a(
+                "StatsNZ data",
+                href="https://datafinder.stats.govt.nz/",
+                target="_blank",
+            )
+        ),
+        ui.tags.li(
+            ui.a(
+                "RNZ: Pros and cons of working from home",
+                href="https://www.rnz.co.nz/news/national/528854/the-pros-and-cons-of-working-from-home",
+                target="_blank",
+            )
+        ),
 
        ui.tags.li(
         ui.a(
@@ -300,7 +307,7 @@ ui.tags.ul(
     ),
 ),
 
-ui.h4("How to Use the dashboard"),
+ui.h5("How to Use the dashboard"),
 
 ui.tags.ul(
     ui.tags.li("Open the dashboard tab to view maps and statistics."),
@@ -311,7 +318,7 @@ ui.tags.ul(
 ui.hr(),
 
 # Key stats
-ui.h5("Key Statistics"),
+ui.h6("Key Statistics"),
 
 ui.tags.ul(
 
@@ -619,4 +626,3 @@ def server(input, output, session):
 
 #App
 app = App(app_ui, server)
-
