@@ -79,29 +79,26 @@ format:
 <div>
 <p></p><figure class="figure"><p></p>
 <div>
-<pre class="mermaid mermaid-js">flowchart TD
+<pre class="mermaid mermaid-js">%%{init: {
+  "flowchart": { "nodeSpacing": 15, "rankSpacing": 35 },
+  "themeVariables": { "fontSize": "10px" }
+}}%%
 
-A[User Inputs] --&gt; B[Reactive Filtering]
+flowchart LR
 
-A1[Work Radio Buttons] --&gt; B
-A2[Study Radio Buttons] --&gt; B
-A3[Difference Slider] --&gt; B
+A[Inputs] --&gt; B[Reactive filter]
 
-B --&gt; C[Filtered Work GeoDataFrame]
-B --&gt; D[Filtered Study GeoDataFrame]
+B --&gt; C[Work data]
+B --&gt; D[Study data]
 
-C --&gt; E[GeoJSON Map Layers]
-D --&gt; F[GeoJSON Map Layers]
+C --&gt; E[Work map]
+C --&gt; F[Work chart]
 
-C --&gt; G[Plotly Work Charts]
-D --&gt; H[Plotly Study Charts]
+D --&gt; G[Study map]
+D --&gt; H[Study chart]
 
-E --&gt; I[Interactive Work Map]
-F --&gt; J[Interactive Study Map]
-
-G --&gt; K[Statistics Outputs]
-H --&gt; K
-
+F --&gt; I[Statistics]
+H --&gt; I
 </pre>
 </div>
 <p></p></figure><p></p>

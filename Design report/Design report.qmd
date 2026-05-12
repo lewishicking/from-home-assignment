@@ -25,29 +25,26 @@ This dashboard uses Auckland SA2 boundary data, combined with Census data from 2
 The dashboard is developed using Shiny for Python with reactive programming. The dashboard included user inputs such as radio buttons and sliders, driven by reactive calculations and filtering underlying GeoDataFrames. Filtered datasets are passed to maps and charts. Visual outputs are automatically updated. Interactive maps are built with ipyleaflet and GeoJSON layers, and charts are built with Plotly Express. There are custom functions like make_geojson() and make_bar(), that reduce code repetition and improve readability. When running the app, it was clear that geometries needed to be reduced in file size for it to run. Maps were also only installed once before being reactively updated. From these changes, the app could run smoothly.
 
 ```{mermaid}
-flowchart TD
+%%{init: {
+  "flowchart": { "nodeSpacing": 15, "rankSpacing": 35 },
+  "themeVariables": { "fontSize": "10px" }
+}}%%
 
-A[User Inputs] --> B[Reactive Filtering]
+flowchart LR
 
-A1[Work Radio Buttons] --> B
-A2[Study Radio Buttons] --> B
-A3[Difference Slider] --> B
+A[Inputs] --> B[Reactive filter]
 
-B --> C[Filtered Work GeoDataFrame]
-B --> D[Filtered Study GeoDataFrame]
+B --> C[Work data]
+B --> D[Study data]
 
-C --> E[GeoJSON Map Layers]
-D --> F[GeoJSON Map Layers]
+C --> E[Work map]
+C --> F[Work chart]
 
-C --> G[Plotly Work Charts]
-D --> H[Plotly Study Charts]
+D --> G[Study map]
+D --> H[Study chart]
 
-E --> I[Interactive Work Map]
-F --> J[Interactive Study Map]
-
-G --> K[Statistics Outputs]
-H --> K
-
+F --> I[Statistics]
+H --> I
 ```
 
 ## 4. User interface walkthrough

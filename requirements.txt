@@ -1,0 +1,7 @@
+shiny
+shinywidgets
+ipyleaflet
+ipywidgets
+geopandas
+plotly
+shinyswatch
